@@ -18,7 +18,7 @@ var sUtil = require('./lib/util');
 var apiUtil = require('./lib/api-util');
 var packageInfo = require('./package.json');
 var yaml = require('js-yaml');
-var mjAPI = require("mathoid-mathjax-node/lib/mj-single.js");
+var mjAPI = require("mathoid-mathjax-node");
 
 
 /**
@@ -142,6 +142,9 @@ function initApp(options) {
             TeX: {noErrors: {disabled: true}}//,
             //TeX: {extensions: ["mediawiki-texvc.js"]}
         }
+    });
+    mjAPI.config( {
+        extensions: 'TeX/mediawiki-texvc', // a convenience option to add MathJax extensions
     });
     mjAPI.start();
 
