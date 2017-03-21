@@ -136,15 +136,12 @@ function initApp(options) {
     app.use(bodyParser.urlencoded({extended: true}));
 
     mjAPI.config({
+        extensions: "mediawiki-texvc.js, mhchem.js",
         MathJax: {
             menuSettings: {semantics: true},
             SVG: {font: "TeX"},
             TeX: {noErrors: {disabled: true}}//,
-            //TeX: {extensions: ["mediawiki-texvc.js"]}
         }
-    });
-    mjAPI.config( {
-        extensions: 'TeX/mediawiki-texvc', // a convenience option to add MathJax extensions
     });
     mjAPI.start();
 
