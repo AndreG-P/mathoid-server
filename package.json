@@ -47,9 +47,10 @@
     "mathoid-mathjax-node": "git+https://github.com/physikerwelt/mathjax-node.git#mathoid-0-7-0",
     "preq": "^0.4.10",
     "service-runner": "^2.0.4",
+    "speech-rule-engine": "*",
     "svgo": "^0.7.1",
-    "texvcinfo": "^0.4.2",
-    "swagger-router": "^0.5.2"
+    "swagger-router": "^0.5.2",
+    "texvcinfo": "^0.4.2"
   },
   "devDependencies": {
     "commander": "^2.9.0",
