@@ -115,7 +115,7 @@ function handleRequest(res, q, type, outFormat, features, req) {
         math: q,
         format: type,
         svg: svg,
-        mathoidStyle: img,
+        svgNode: img,
         mml: mml,
         speakText: speech,
         png: png
@@ -134,6 +134,13 @@ function handleRequest(res, q, type, outFormat, features, req) {
         data.success = true;
         // @deprecated
         data.log = "success";
+        if (data.svgNode) {
+            data.mathoidStyle = [
+                data.svgNode.style.cssText,
+                " width:",data.svgNode.getAttribute("width"),"; height:",data.svgNode.getAttribute("height"),';'
+            ].join("");
+        }
+
 
         // Return the sanitized TeX to the client
         if (sanitizedTex !== undefined) {
