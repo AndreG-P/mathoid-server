@@ -6,6 +6,8 @@ var sUtil = require('../lib/util');
 var texvcInfo = require('texvcinfo');
 var sre = require('speech-rule-engine');
 var SVGO = require('svgo');
+var Readable = require('stream').Readable;
+var rsvg = require('librsvg').Rsvg;
 
 var HTTPError = sUtil.HTTPError;
 var svgo = new SVGO({
@@ -67,6 +69,38 @@ var srePostProcessor = function(config, result) {
     return result;
 };
 
+//
+//  Create the PNG file asynchronously, reporting errors.
+//
+function GetPNG(result, resolve) {
+    var s = new Readable();
+    var pngScale = app.conf.dpi / 90; // 90 DPI is the effective setting used by librsvg
+    var ex = 6;
+    var width = result.svgNode.getAttribute("width").replace("ex", "") * ex;
+    var height = result.svgNode.getAttribute("height").replace("ex", "") * ex;
+
+    var svgRenderer = new rsvg();
+    s._read = function () {
+        s.push(result.svg.replace(/="currentColor"/g, '="black"'));
+        s.push(null);
+    };
+    svgRenderer.on('finish', function () {
+        try {
+            var buffer = svgRenderer.render({
+                format: 'png',
+                width: width * pngScale,
+                height: height * pngScale
+            }).data;
+            result.png = buffer || new Buffer();
+        } catch (e) {
+            result.errors = e.message;
+        }
+        resolve(result);
+    });
+    s.pipe(svgRenderer);
+    return resolve;  // This keeps the queue from continuing until the readFile() is complete
+}
+
 /* The response headers for different render types */
 var outHeaders = function (data) {
     return {
@@ -121,7 +155,7 @@ var optimizeSvg = function (data, req, cb) {
 
 function handleRequest(res, q, type, outFormat, features, req) {
     var sanitizedTex, feedback;
-    var svg = app.conf.svg && /^svg|json|complete$/.test(outFormat);
+    var svg = app.conf.svg && /^svg|json|complete|png$/.test(outFormat);
     var mml = (type !== "MathML") && /^mml|json|complete$/.test(outFormat);
     var png = app.conf.png && /^png|json|complete$/.test(outFormat);
     var info = app.conf.texvcinfo && /^graph|texvcinfo$/.test(outFormat);
@@ -157,28 +191,32 @@ function handleRequest(res, q, type, outFormat, features, req) {
         math: q,
         format: type,
         svg: svg,
-        svgNode: img,
-        mml: mml,
-        png: png
+        svgNode: img + png,
+        mml: mml
     };
     if (speech){
         mathJaxOptions.mmlNode = true;
         mathJaxOptions.mml = true;
-    }
-    if (app.conf.dpi) {
-        mathJaxOptions.dpi = app.conf.dpi;
     }
     return new BBPromise(function(resolve, reject) {
         app.mjAPI.typeset(mathJaxOptions, function (data) {
                 resolve(data);
         });
     }).then(function (data) {
+        return new BBPromise(function(resolve, reject) {
+            if (png) {
+                GetPNG(data,resolve);
+            } else {
+                resolve(data);
+            }
+        });
+    })
+        .then(function (data) {
         if (data.errors) {
             emitError(data.errors);
         }
         if (speech) {
             data = srePostProcessor(app.conf.speech_config, data);
-            data.mmlNode = false;
         }
         data.success = true;
         // @deprecated
@@ -188,10 +226,12 @@ function handleRequest(res, q, type, outFormat, features, req) {
                 data.svgNode.style.cssText,
                 " width:",data.svgNode.getAttribute("width"),"; height:",data.svgNode.getAttribute("height"),';'
             ].join("");
-            data.svgNode = false;
         }
 
 
+        // make sure to delete non serializable objects
+        delete data.svgNode;
+        delete data.mmlNode;
         // Return the sanitized TeX to the client
         if (sanitizedTex !== undefined) {
             data.sanetex = sanitizedTex;
