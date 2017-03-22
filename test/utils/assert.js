@@ -52,8 +52,10 @@ function deepEqual(result, expected, message) {
             assert.deepEqual(result, expected, message);
         }
     } catch (e) {
-        console.log('Expected:\n' + JSON.stringify(expected, null, 2));
-        console.log('Result:\n' + JSON.stringify(result, null, 2));
+        // Temporary remove the large debug output and rely on the IDE features
+        // console.log('Expected:\n' + JSON.stringify(expected, null, 2));
+        // console.log('Result:\n' + JSON.stringify(result, null, 2));
+        assert.equal(expected,result);
         throw e;
     }
 
