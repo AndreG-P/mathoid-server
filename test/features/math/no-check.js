@@ -163,7 +163,7 @@ var testData = [
 
 describe('Mathoid API tests with no_check option', function () {
     before(function (cb) {
-        server.start({no_check:true, png:false});
+        server.start({no_check: true, png: false, speech_config: {enrich: false}});
         // Wait for MathJax startup, as that's somewhat async but has a sync
         // interface
         setTimeout(cb, 1000);

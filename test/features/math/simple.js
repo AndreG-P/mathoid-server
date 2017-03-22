@@ -179,7 +179,7 @@ var testData = [
 
 describe('Simple Mathoid API tests', function () {
     before(function (cb) {
-        server.start();
+        server.start({ speech_config: {enrich: false}});
         // Wait for MathJax startup, as that's somewhat async but has a sync
         // interface
         setTimeout(cb, 1000);
