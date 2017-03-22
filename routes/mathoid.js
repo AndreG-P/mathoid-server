@@ -61,6 +61,9 @@ var srePostProcessor = function(config, result) {
         // update serialization
         if (result.mml) result.mml = result.mmlNode.outerHTML;
     }
+    if (config.enrich) {
+        result.mml = sre.toEnriched(result.mml).toString();
+    }
     return result;
 };
 
@@ -174,15 +177,7 @@ function handleRequest(res, q, type, outFormat, features, req) {
             emitError(data.errors);
         }
         if (speech) {
-            var speechConfig = {
-                semantics: true,
-                domain:  'mathspeak',
-                style:  'default',
-                semantic: false,
-                minSTree: false,
-                speakText: true
-            };
-            data = srePostProcessor(speechConfig, data);
+            data = srePostProcessor(app.conf.speech_config, data);
             data.mmlNode = false;
         }
         data.success = true;
