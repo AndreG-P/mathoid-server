@@ -46,9 +46,9 @@
     "js-yaml": "^3.6.1",
     "librsvg": "^0.7.0",
     "mathoid-mathjax-node": "git+https://github.com/physikerwelt/mathjax-node.git#mathoid-0-7-0",
-    "preq": "^0.4.10",
+    "preq": "^0.5.2",
     "service-runner": "^2.0.4",
-    "speech-rule-engine": "*",
+    "speech-rule-engine": "1.2.0",
     "svgo": "^0.7.1",
     "swagger-router": "^0.5.2",
     "texvcinfo": "^0.4.2"
