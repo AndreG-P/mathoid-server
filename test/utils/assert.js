@@ -69,9 +69,10 @@ function xEqual(result,expected,message) {
     var domReal = parser.parseFromString(result);
     var domRef = parser.parseFromString(expected);
     var cmp = compare(domRef, domReal);
-    if(cmp.getResult()){
+    if(!cmp.getResult() ){
         console.log(reporter.report(cmp));
         assert.deepEqual(result,expected,message);
+
     }
 }
 
