@@ -198,6 +198,8 @@ describe('Simple Mathoid API tests', function () {
                         if (key === 'png') {
                             assert.notDeepEqual(res.body.png, undefined);
                             assert.notDeepEqual(res.body.png.length, 0);
+                        } else if ( /mml|svg/.test(key) ) {
+                            assert.xEqual(res.body[key], data.response.body[key]);
                         } else {
                             assert.deepEqual(res.body[key], data.response.body[key]);
                         }
