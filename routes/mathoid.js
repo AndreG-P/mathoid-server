@@ -7,7 +7,7 @@ var texvcInfo = require('texvcinfo');
 var sre = require('speech-rule-engine');
 var SVGO = require('svgo');
 var Readable = require('stream').Readable;
-var rsvg = require('librsvg').Rsvg;
+//var rsvg = require('librsvg').Rsvg;
 
 var HTTPError = sUtil.HTTPError;
 var svgo = new SVGO({
@@ -79,11 +79,12 @@ function GetPNG(result, resolve) {
     var width = result.svgNode.getAttribute("width").replace("ex", "") * ex;
     var height = result.svgNode.getAttribute("height").replace("ex", "") * ex;
 
-    var svgRenderer = new rsvg();
+    //var svgRenderer = new rsvg();
     s._read = function () {
         s.push(result.svg.replace(/="currentColor"/g, '="black"'));
         s.push(null);
     };
+    /*
     svgRenderer.on('finish', function () {
         try {
             var buffer = svgRenderer.render({
@@ -98,6 +99,7 @@ function GetPNG(result, resolve) {
         resolve(result);
     });
     s.pipe(svgRenderer);
+    */
     return resolve;  // This keeps the queue from continuing until the readFile() is complete
 }
 
